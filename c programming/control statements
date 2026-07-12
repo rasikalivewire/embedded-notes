@@ -1,0 +1,266 @@
+#include <stdio.h>
+
+int main()
+{
+    //if
+    /*int a=10;
+    int b=5;
+    if (a>b){
+        
+    printf("a is greater than b");
+    }
+    
+    //if else
+       int a=10;
+    int b=10;
+    if (a!=b){
+        
+    printf("a is not equal to b");
+    }else{
+        printf("a is equal to b");
+    }
+    int p;
+    printf("enter your pw");
+    scanf("%d",&p);
+    printf("%d",p);
+    if(p==123){
+        printf("login success");
+    }else{
+        printf("pw invalid");
+    }
+    //else if
+    int b=30;
+    if(b<20){
+        printf("charge now");
+    }else if(b<50){
+        printf("power saving mode on");
+    }
+    else{
+        printf("charge later");
+    }
+    
+    //nested if
+    int b=3;
+    if(b>70){
+        printf("charge now");
+        if(b<5){
+            printf("i am dying for u");
+        }
+    }else if(b<50){
+        printf("power saving mode on");
+        if(b<5){
+            printf("i am dying for u");
+        }
+    }
+    else{
+        printf("charge later");
+    }
+    printf("1.rx 100,2.pulsar\n");
+    
+    int bike=2;
+    switch(bike){
+        case 1:
+            printf("rx 100,1l");
+            break;
+         case 2:
+            printf("pulsar,1.5l");
+            break;
+         case 3:
+            printf("tvs");
+            break;
+         case 4:
+            printf("duke");
+            break;
+         case 5:
+            printf("dio");
+            break;
+         case 6:
+            printf("RE");
+            break;
+        default:
+        printf("invalid");
+      #include <stdio.h>
+
+int main()
+{
+    //for loop inc
+       /*for(int i=0;i<3;i++){
+           printf("%d",i);
+       }
+       //for loop dec
+       for(int i=10;i>3;i--){
+           printf("%d\n",i);
+       }
+       //for infi
+       for(;;){
+           printf("hi students\n");
+       //nested for
+       for(int i=0;i<3;i++){
+            for(int j=0;j<2;j++){
+           printf("%d %d\n",i,j);
+       }
+       }
+       
+       //pattern
+       for(int i=0;i<=3;i++){
+            for(int j=0;j<=3;j++){
+           printf("*");
+       }
+       printf("\n");
+       }
+       
+       
+         for(int i=0;i<=3;i++){
+            for(int j=0;j<=i;j++){
+           printf("*");
+       }
+       printf("\n");
+       }
+       //while loop
+       //increment
+       int i=0;
+       while(i<10){
+           printf("%d",i);
+           i++;
+       }
+             //decrement
+       int i=10;
+       while(i>5){
+           printf("%d",i);
+           i--;
+       }
+       //infi
+       while(1){
+           printf("motor on");
+       }
+       //do while
+       int i=0;
+       do{
+           printf("hi");
+           i++;
+           
+       }while(i<3);
+       
+       //transfer statements
+       //break;
+       for(int i=0;i<6;i++){
+           if(i==4){
+               break;
+           }
+           printf("%d",i);
+       }
+       //continue
+         for(int i=0;i<6;i++){
+           if(i==4){
+               continue;
+           }
+           printf("%d",i);
+       }
+       
+       //arrays
+        int arr[5],i;
+        
+        printf("enter 5 values");
+        for(int i=0;i<5;i++){
+            scanf("%d",&arr[i]);
+            
+        }
+        printf("array values are");
+        for(int i=0;i<5;i++){
+            printf("%d",arr[i]);
+            
+        }*/
+       /*int a;
+       printf("enter value");
+       scanf("%d",&a);
+       printf("your values are %d" ,a);*/
+        
+       /*char a[30];
+       printf("Enter your name :");
+       scanf("%s",a);
+       printf("my name is %s\n",a);
+        
+       char b[40];
+       printf("Enter your name :");
+       fgets(b,sizeof(b),stdin);
+       printf("your name is mr.%s",b);*/
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+      
+}
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+}
