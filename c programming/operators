@@ -1,0 +1,58 @@
+int main()
+{
+ //logical operators
+ /*int a=3;
+ int b=10;
+ int c=7;
+ printf("%d\n",(a<b && b<c));
+ printf("%d\n",(a<b && b>c));
+  printf("%d\n",(a<b || b<c));
+ printf("%d\n",!(a<b || b>c));*/
+ 
+ //bitwise operators
+ /*int a=5;
+ int b=7;
+ printf("%d\n",a&b);
+  printf("%d\n",a|b);
+   printf("%d\n",a^b);
+    printf("%d\n",~(a));
+     printf("%d\n",a<<1);
+      printf("%d\n",a>>1);*/
+      
+      //assignment operators
+      int x=5;
+     /* printf("%d\n",x);
+      x+=4;
+      printf("%d\n",x);
+        x-=6;
+      printf("%d\n",x);
+        x*=7;
+      printf("%d\n",x);
+        x/=3;
+      printf("%d\n",x);
+      
+      //unary operators
+       printf("%d\n",x);
+        printf("%d\n",++x);
+         printf("%d\n",x++);
+          printf("%d\n",x);
+           printf("%d\n",++x);
+           
+         //sizeof operators
+          printf("%zu",sizeof(x));*/
+          
+          //comma operators
+          int a,b,c;
+          c=(a=5,b=6,a+b);
+          printf("%d",c);
+      
+      
+      
+      
+      
+      
+      
+      
+      
+ 
+}
