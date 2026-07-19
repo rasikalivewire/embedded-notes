@@ -1,0 +1,84 @@
+
+//functions
+
+#include<stdio.h>
+//without arguments,without return
+//1
+/*void add() {
+int a = 2, b = 3;
+printf("Sum = %d\n", a + b);
+}
+
+int main() { 
+add(); 
+return 0;
+}*/
+
+// 2 example
+/*void status(){
+    printf("your order delivered successfully");
+}
+int main(){
+    status();
+}*/
+
+
+//without arguments,with return
+/*int add() {
+int a = 2, b = 3;
+return (a+b);
+}
+
+int main() { 
+int a=add();
+printf("%d",a);
+return 0;
+}*/
+
+
+//with arguments,without return
+/*void add(int a,int b) {
+
+printf("Sum = %d\n", a + b);
+}
+
+int main() { 
+add(7,6); 
+return 0;
+}*/
+
+//example
+/*int order(char food[],int qty){
+    printf("your order is %s,%d",food,qty);
+}
+int main(){
+    order("dosa",2);
+}*/
+
+//with arguments,with return
+int add(int a,int b) {
+
+return (a+b);
+}
+
+int main() { 
+int a=add(4,7);
+printf("%d",a);
+return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
