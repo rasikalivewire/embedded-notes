@@ -1,0 +1,48 @@
+
+#include <stdio.h>
+
+//pointer
+
+/*int main() { 
+    int a = 10; 
+    int *p;
+p = &a;	// store address of a
+
+printf("Value of a = %d\n", a);
+printf("Address of a = %p\n", &a);
+printf("Pointer value = %p\n", p);
+printf("Value using pointer = %d\n", *p); 
+return 0;
+}*/
+
+//pointer arithmetic and utilities
+
+/*#include<stdio.h>
+int main(){
+int arr[5] = {10, 20, 30, 40, 50};
+int *ptr = &arr[2]; 
+
+ptr = ptr + 2;      
+printf("%d", *ptr);
+return 0;
+}*/
+
+/*int main(){
+int arr[5] = {10, 20, 30, 40, 50};
+int *ptr = &arr[2]; 
+
+ptr = ptr -2;      
+printf("%d", *ptr);
+return 0;
+}*/
+int main(){
+    int arr[]={10,20,30,40};
+
+int *p1=&arr[0];
+
+int *p2=&arr[3];
+
+printf("%ld",p2-p1);
+
+}
+
