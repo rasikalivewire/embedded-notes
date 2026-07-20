@@ -1,0 +1,408 @@
+/* =========================================================================
+   ONLINE PAYROLL SYSTEM - Mini Project in C
+   -------------------------------------------------------------------------
+   Features:
+     1. Add Employee
+     2. View All Employees
+     3. Search Employee by ID
+     4. Update Employee Details
+     5. Delete Employee
+     6. Calculate & Display Payroll (Basic, HRA, DA, PF, Tax, Net Pay)
+     7. Generate Payslip (saved as a .txt file)
+     8. Exit
+
+   Data is stored persistently in a binary file "employees.dat" so records
+   survive between program runs.
+
+   Compile : gcc payroll_system.c -o payroll_system
+   Run     : ./payroll_system
+   ========================================================================= */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define DATA_FILE   "employees.dat"
+#define MAX_NAME    50
+#define MAX_DESIG   30
+
+/* ---------- Payroll calculation constants (editable) ---------- */
+#define HRA_PERCENT     20.0   /* House Rent Allowance = 20% of Basic  */
+#define DA_PERCENT      10.0   /* Dearness Allowance   = 10% of Basic  */
+#define PF_PERCENT      12.0   /* Provident Fund        = 12% of Basic */
+#define TAX_PERCENT      5.0   /* Professional Tax      = 5% of Gross  */
+
+/* ---------- Employee record structure ---------- */
+typedef struct {
+    int    id;
+    char   name[MAX_NAME];
+    char   designation[MAX_DESIG];
+    double basicSalary;
+} Employee;
+
+/* ---------- Computed payroll breakdown ---------- */
+typedef struct {
+    double basic;
+    double hra;
+    double da;
+    double grossPay;
+    double pf;
+    double tax;
+    double totalDeductions;
+    double netPay;
+} Payroll;
+
+/* ========================= Utility Functions ========================= */
+
+void clearInputBuffer(void) {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void pause_screen(void) {
+    printf("\nPress Enter to continue...");
+    clearInputBuffer();
+}
+
+/* ========================= File Handling Helpers ========================= */
+
+/* Returns number of employee records currently stored */
+int countEmployees(void) {
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if (fp == NULL) return 0;
+
+    Employee temp;
+    int count = 0;
+    while (fread(&temp, sizeof(Employee), 1, fp) == 1) count++;
+    fclose(fp);
+    return count;
+}
+
+/* Generates the next unique employee ID */
+int getNextId(void) {
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if (fp == NULL) return 1001;
+
+    Employee temp;
+    int maxId = 1000;
+    while (fread(&temp, sizeof(Employee), 1, fp) == 1) {
+        if (temp.id > maxId) maxId = temp.id;
+    }
+    fclose(fp);
+    return maxId + 1;
+}
+
+/* ========================= Payroll Calculation ========================= */
+
+Payroll calculatePayroll(double basic) {
+    Payroll p;
+    p.basic = basic;
+    p.hra   = basic * HRA_PERCENT / 100.0;
+    p.da    = basic * DA_PERCENT  / 100.0;
+    p.grossPay = p.basic + p.hra + p.da;
+
+    p.pf  = basic * PF_PERCENT / 100.0;
+    p.tax = p.grossPay * TAX_PERCENT / 100.0;
+    p.totalDeductions = p.pf + p.tax;
+
+    p.netPay = p.grossPay - p.totalDeductions;
+    return p;
+}
+
+void printPayrollBreakdown(Employee e, Payroll p) {
+    printf("\n--------------------------------------------------\n");
+    printf(" PAYROLL BREAKDOWN - %s (ID: %d)\n", e.name, e.id);
+    printf("--------------------------------------------------\n");
+    printf(" Basic Salary        : %10.2f\n", p.basic);
+    printf(" HRA  (%.0f%%)          : %10.2f\n", HRA_PERCENT, p.hra);
+    printf(" DA   (%.0f%%)          : %10.2f\n", DA_PERCENT, p.da);
+    printf(" ------------------------------------\n");
+    printf(" Gross Pay           : %10.2f\n", p.grossPay);
+    printf(" PF Deduction (%.0f%%)  : %10.2f\n", PF_PERCENT, p.pf);
+    printf(" Prof. Tax (%.0f%%)     : %10.2f\n", TAX_PERCENT, p.tax);
+    printf(" Total Deductions    : %10.2f\n", p.totalDeductions);
+    printf(" ------------------------------------\n");
+    printf(" NET PAY             : %10.2f\n", p.netPay);
+    printf("--------------------------------------------------\n");
+}
+
+/* ========================= Core Operations ========================= */
+
+void addEmployee(void) {
+    Employee e;
+    e.id = getNextId();
+
+    printf("\n--- Add New Employee ---\n");
+    printf("Assigned Employee ID: %d\n", e.id);
+
+    printf("Enter Name          : ");
+    clearInputBuffer();
+    fgets(e.name, MAX_NAME, stdin);
+    e.name[strcspn(e.name, "\n")] = '\0';
+
+    printf("Enter Designation   : ");
+    fgets(e.designation, MAX_DESIG, stdin);
+    e.designation[strcspn(e.designation, "\n")] = '\0';
+
+    printf("Enter Basic Salary  : ");
+    scanf("%lf", &e.basicSalary);
+
+    if (e.basicSalary <= 0) {
+        printf("Invalid salary. Employee not added.\n");
+        return;
+    }
+
+    FILE *fp = fopen(DATA_FILE, "ab");
+    if (fp == NULL) {
+        printf("Error: could not open data file.\n");
+        return;
+    }
+    fwrite(&e, sizeof(Employee), 1, fp);
+    fclose(fp);
+
+    printf("\nEmployee '%s' added successfully with ID %d.\n", e.name, e.id);
+}
+
+void viewAllEmployees(void) {
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if (fp == NULL) {
+        printf("\nNo employee records found.\n");
+        return;
+    }
+
+    Employee e;
+    int found = 0;
+    printf("\n%-6s %-20s %-15s %-12s\n", "ID", "Name", "Designation", "Basic Salary");
+    printf("---------------------------------------------------------------\n");
+    while (fread(&e, sizeof(Employee), 1, fp) == 1) {
+        printf("%-6d %-20s %-15s %-12.2f\n", e.id, e.name, e.designation, e.basicSalary);
+        found = 1;
+    }
+    fclose(fp);
+
+    if (!found) printf("No employee records found.\n");
+}
+
+/* Reads a record matching the given ID into *out. Returns 1 if found. */
+int findEmployeeById(int id, Employee *out) {
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if (fp == NULL) return 0;
+
+    Employee e;
+    while (fread(&e, sizeof(Employee), 1, fp) == 1) {
+        if (e.id == id) {
+            *out = e;
+            fclose(fp);
+            return 1;
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+void searchEmployee(void) {
+    int id;
+    printf("\nEnter Employee ID to search: ");
+    scanf("%d", &id);
+
+    Employee e;
+    if (findEmployeeById(id, &e)) {
+        printf("\nEmployee Found:\n");
+        printf("ID          : %d\n", e.id);
+        printf("Name        : %s\n", e.name);
+        printf("Designation : %s\n", e.designation);
+        printf("Basic Salary: %.2f\n", e.basicSalary);
+    } else {
+        printf("\nNo employee found with ID %d.\n", id);
+    }
+}
+
+void updateEmployee(void) {
+    int id;
+    printf("\nEnter Employee ID to update: ");
+    scanf("%d", &id);
+
+    FILE *fp = fopen(DATA_FILE, "rb+");
+    if (fp == NULL) {
+        printf("No records found.\n");
+        return;
+    }
+
+    Employee e;
+    long pos;
+    int found = 0;
+
+    while (fread(&e, sizeof(Employee), 1, fp) == 1) {
+        if (e.id == id) {
+            found = 1;
+            pos = ftell(fp) - (long)sizeof(Employee);
+
+            printf("Current Name        : %s\n", e.name);
+            printf("Enter New Name      : ");
+            clearInputBuffer();
+            fgets(e.name, MAX_NAME, stdin);
+            e.name[strcspn(e.name, "\n")] = '\0';
+
+            printf("Current Designation : %s\n", e.designation);
+            printf("Enter New Designation: ");
+            fgets(e.designation, MAX_DESIG, stdin);
+            e.designation[strcspn(e.designation, "\n")] = '\0';
+
+            printf("Current Basic Salary: %.2f\n", e.basicSalary);
+            printf("Enter New Basic Salary: ");
+            scanf("%lf", &e.basicSalary);
+
+            fseek(fp, pos, SEEK_SET);
+            fwrite(&e, sizeof(Employee), 1, fp);
+            printf("\nEmployee record updated successfully.\n");
+            break;
+        }
+    }
+
+    fclose(fp);
+    if (!found) printf("\nNo employee found with ID %d.\n", id);
+}
+
+void deleteEmployee(void) {
+    int id;
+    printf("\nEnter Employee ID to delete: ");
+    scanf("%d", &id);
+
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if (fp == NULL) {
+        printf("No records found.\n");
+        return;
+    }
+
+    FILE *temp = fopen("temp.dat", "wb");
+    Employee e;
+    int found = 0;
+
+    while (fread(&e, sizeof(Employee), 1, fp) == 1) {
+        if (e.id == id) {
+            found = 1;
+            continue; /* skip writing this record -> effectively deletes it */
+        }
+        fwrite(&e, sizeof(Employee), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    remove(DATA_FILE);
+    rename("temp.dat", DATA_FILE);
+
+    if (found)
+        printf("\nEmployee with ID %d deleted successfully.\n", id);
+    else
+        printf("\nNo employee found with ID %d.\n", id);
+}
+
+void payrollMenu(void) {
+    int id;
+    printf("\nEnter Employee ID for payroll calculation: ");
+    scanf("%d", &id);
+
+    Employee e;
+    if (!findEmployeeById(id, &e)) {
+        printf("\nNo employee found with ID %d.\n", id);
+        return;
+    }
+
+    Payroll p = calculatePayroll(e.basicSalary);
+    printPayrollBreakdown(e, p);
+}
+
+void generatePayslip(void) {
+    int id;
+    printf("\nEnter Employee ID to generate payslip: ");
+    scanf("%d", &id);
+
+    Employee e;
+    if (!findEmployeeById(id, &e)) {
+        printf("\nNo employee found with ID %d.\n", id);
+        return;
+    }
+
+    Payroll p = calculatePayroll(e.basicSalary);
+
+    char filename[70];
+    sprintf(filename, "payslip_%d.txt", e.id);
+
+    FILE *fp = fopen(filename, "w");
+    if (fp == NULL) {
+        printf("Error: could not create payslip file.\n");
+        return;
+    }
+
+    fprintf(fp, "====================================================\n");
+    fprintf(fp, "                    PAYSLIP\n");
+    fprintf(fp, "====================================================\n");
+    fprintf(fp, "Employee ID   : %d\n", e.id);
+    fprintf(fp, "Name          : %s\n", e.name);
+    fprintf(fp, "Designation   : %s\n", e.designation);
+    fprintf(fp, "----------------------------------------------------\n");
+    fprintf(fp, "Basic Salary  : %10.2f\n", p.basic);
+    fprintf(fp, "HRA           : %10.2f\n", p.hra);
+    fprintf(fp, "DA            : %10.2f\n", p.da);
+    fprintf(fp, "Gross Pay     : %10.2f\n", p.grossPay);
+    fprintf(fp, "----------------------------------------------------\n");
+    fprintf(fp, "PF Deduction  : %10.2f\n", p.pf);
+    fprintf(fp, "Prof. Tax     : %10.2f\n", p.tax);
+    fprintf(fp, "Total Deducts : %10.2f\n", p.totalDeductions);
+    fprintf(fp, "----------------------------------------------------\n");
+    fprintf(fp, "NET PAY       : %10.2f\n", p.netPay);
+    fprintf(fp, "====================================================\n");
+
+    fclose(fp);
+    printf("\nPayslip generated: %s\n", filename);
+}
+
+/* ========================= Main Menu ========================= */
+
+void printMenu(void) {
+    printf("\n====================================================\n");
+    printf("          ONLINE PAYROLL MANAGEMENT SYSTEM\n");
+    printf("====================================================\n");
+    printf(" 1. Add Employee\n");
+    printf(" 2. View All Employees\n");
+    printf(" 3. Search Employee\n");
+    printf(" 4. Update Employee\n");
+    printf(" 5. Delete Employee\n");
+    printf(" 6. Calculate Payroll\n");
+    printf(" 7. Generate Payslip\n");
+    printf(" 8. Exit\n");
+    printf("====================================================\n");
+    printf("Enter your choice: ");
+}
+
+int main(void) {
+    int choice;
+
+    do {
+        printMenu();
+        if (scanf("%d", &choice) != 1) {
+            clearInputBuffer();
+            printf("Invalid input. Please enter a number.\n");
+            continue;
+        }
+
+        switch (choice) {
+            case 1: addEmployee();       break;
+            case 2: viewAllEmployees();  break;
+            case 3: searchEmployee();    break;
+            case 4: updateEmployee();    break;
+            case 5: deleteEmployee();    break;
+            case 6: payrollMenu();       break;
+            case 7: generatePayslip();   break;
+            case 8:
+                printf("\nExiting... Thank you for using the Payroll System!\n");
+                break;
+            default:
+                printf("\nInvalid choice. Please select 1-8.\n");
+        }
+
+    } while (choice != 8);
+
+    return 0;
+}
