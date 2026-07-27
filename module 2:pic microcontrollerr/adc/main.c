@@ -1,8 +1,3 @@
-/*
- * PIC16F877A
- * ADC (AN0) + UART (9600)
- * XC8 Compiler
- */
 
 #include <xc.h>
 #include <stdio.h>
