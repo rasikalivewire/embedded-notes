@@ -1,4 +1,3 @@
-
 #include <xc.h>
 #include <stdio.h>
 
@@ -34,7 +33,7 @@ void UART_Init(void)
     TRISC6 = 1;      // TX pin
     TRISC7 = 1;      // RX pin
 
-    SPBRG = 129;     // 9600 baud @ 20MHz
+    SPBRG = 129;     // 9600 baud @ 20MHz (BRGH = 1)
 
     BRGH = 1;        // High speed
     SYNC = 0;        // Async mode
@@ -70,21 +69,20 @@ void UART_SendString(const char *s)
 ------------------------------------------------------------------*/
 void ADC_Init(void)
 {
-    TRISA0 = 1;      // AN0 input
+    TRISA0 = 1;      // Set RA0/AN0 as input
 
     /*
      * ADFM = 1  -> Right Justified
-     * AN0 Analog
-     * Vref = VDD/VSS
+     * PCFG3:PCFG0 = 0000 -> AN0 to AN7 as analog inputs, VREF = VDD/VSS
      */
     ADCON1 = 0b10000000;
 
     /*
-     * CHS = 000 -> AN0
-     * ADCS = Fosc/32
-     * ADON = 1
+     * ADCS1:ADCS0 = 10 -> Fosc/32
+     * CHS2:CHS0   = 000 -> Initial channel AN0
+     * ADON        = 1  -> Turn on ADC module
      */
-   // ADCON0 = 0b10000000;
+    ADCON0 = 0b10000001;
 }
 
 /*------------------------------------------------------------------
@@ -94,10 +92,10 @@ unsigned int ADC_Read(unsigned char channel)
 {
     unsigned int result;
 
-    ADCON0 &= 0xC5;                 // Clear channel bits
+    ADCON0 &= 0xC5;                 // Clear channel bits (CHS2:CHS0)
     ADCON0 |= (channel << 3);       // Select channel
 
-    __delay_us(20);                 // Acquisition time
+    __delay_us(20);                 // Acquisition time for capacitor charge
 
     GO_DONE = 1;                    // Start conversion
 
