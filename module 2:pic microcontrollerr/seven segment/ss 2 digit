@@ -1,0 +1,75 @@
+#include <xc.h>
+
+#define _XTAL_FREQ 20000000
+
+#pragma config FOSC = HS
+#pragma config WDTE = OFF
+#pragma config PWRTE = ON
+#pragma config BOREN = OFF
+#pragma config LVP = OFF
+#pragma config CPD = OFF
+#pragma config WRT = OFF
+#pragma config CP = OFF
+
+const unsigned char digit[10] =
+{
+    0x3F,   //0
+    0x06,   //1
+    0x5B,   //2
+    0x4F,   //3
+    0x66,   //4
+    0x6D,   //5
+    0x7D,   //6
+    0x07,   //7
+    0x7F,   //8
+    0x6F    //9
+};
+
+void display(unsigned char num)
+{
+    unsigned char tens = num / 10;
+    unsigned char ones = num % 10;
+
+    // Display Tens Digit
+    RC0 = 1;      // Disable both digits
+    RC1 = 1;
+
+    PORTD = digit[tens];
+
+    RC0 = 0;      // Enable Digit 1 (active LOW)
+    __delay_ms(2);
+    RC0 = 1;
+
+    // Display Ones Digit
+    PORTD = digit[ones];
+
+    RC1 = 0;      // Enable Digit 2 (active LOW)
+    __delay_ms(2);
+    RC1 = 1;
+}
+
+void main()
+{
+    unsigned char count;
+
+    ADCON1 = 0x06;
+
+    TRISD = 0x00;
+    TRISC = 0x00;
+
+    PORTD = 0x00;
+    PORTC = 0x03;     // Both digits OFF
+
+    while(1)
+    {
+        for(count = 0; count < 100; count++)
+        {
+            unsigned int i;
+
+            for(i = 0; i < 250; i++)
+            {
+                display(count);
+            }
+        }
+    }
+}
