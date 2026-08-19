@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,11 +55,19 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
+void Servo_SetAngle(uint8_t angle);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Servo_SetAngle(uint8_t angle)
+{
+    uint16_t pulse;
 
+    pulse = 1000 + ((uint32_t)angle * 1000U) / 180U;
+
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, pulse);
+}
 /* USER CODE END 0 */
 
 /**
@@ -94,9 +102,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
-
-
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,12 +112,32 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,1000);
-	  HAL_Delay(1000);
-	  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,1500);
-	  HAL_Delay(1000);
-	  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,2000);
-	  HAL_Delay(1000);
+	 /* Servo_SetAngle(0);
+	      HAL_Delay(1000);
+
+	      Servo_SetAngle(90);
+	      HAL_Delay(1000);
+
+	      Servo_SetAngle(180);
+	      HAL_Delay(1000);*/
+	  /*__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1000);
+	         HAL_Delay(2000);
+
+	         __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1500);
+	         HAL_Delay(2000);
+
+	         __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 2000);
+	         HAL_Delay(2000);*/
+
+
+
+	      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1000);
+	      HAL_Delay(3000);
+
+	      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 2000);
+	      HAL_Delay(3000);
+
+
   }
   /* USER CODE END 3 */
 }
@@ -128,12 +154,13 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -174,9 +201,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 63;
+  htim2.Init.Prescaler = 71;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 65535;
+  htim2.Init.Period = 19999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -202,7 +229,7 @@ static void MX_TIM2_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
