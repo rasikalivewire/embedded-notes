@@ -1,50 +1,53 @@
-/*
- * File:   main.c
- * Author: Surya
- *
- * Created on 23 June, 2026, 10:18 AM
- */
-
 #include <xc.h>
 
-#define _XTAL_FREQ 16000000
+#define _XTAL_FREQ 20000000
 
-// CONFIG
 #pragma config FOSC = HS
 #pragma config WDTE = OFF
-#pragma config PWRTE = OFF
-#pragma config BOREN = OFF
+#pragma config PWRTE = ON
+#pragma config BOREN = ON
 #pragma config LVP = OFF
 #pragma config CPD = OFF
 #pragma config WRT = OFF
 #pragma config CP = OFF
 
+volatile unsigned int count = 0;
+
 void __interrupt() ISR(void)
 {
-    if(TMR0IF)
+    if (INTCONbits.TMR0IF)
     {
-        TMR0IF = 0;      // Clear interrupt flag
-        TMR0 = 61;     // Reload value
+        TMR0 = 61;
+        INTCONbits.TMR0IF = 0;
 
-        RB0 = !RB0;    // Toggle LED
+        count++;
+
+        if (count >= 100)
+        {
+            count = 0;
+            RB1 = !RB1;
+        }
     }
 }
 
-void main()
+void main(void)
 {
-    TRISB0 = 0;
-    RB0 = 0;
+    TRISBbits.TRISB1 = 0;
+    RB1 = 0;
 
-    OPTION_REG = 0x07;
-    // Prescaler = 256
-    // Assigned to Timer0
+    OPTION_REGbits.T0CS = 0;
+    OPTION_REGbits.T0SE = 0;
+    OPTION_REGbits.PSA = 0;
+
+    OPTION_REGbits.PS2 = 1;
+    OPTION_REGbits.PS1 = 1;
+    OPTION_REGbits.PS0 = 1;
 
     TMR0 = 61;
 
-    INTCONbits.T0IE = 1;     // Enable Timer0 interrupt
-    INTCONbits.GIE = 1;      // Global interrupt enable
-    INTCONbits.PEIE = 1;
-    
+    INTCONbits.TMR0IF = 0;
+    INTCONbits.TMR0IE = 1;
+    INTCONbits.GIE = 1;
 
     while(1)
     {
