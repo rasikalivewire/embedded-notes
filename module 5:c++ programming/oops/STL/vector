@@ -1,0 +1,17 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> marks = {80, 90, 75, 88};
+
+    cout << marks[0] << endl;
+
+    marks.push_back(95);
+
+    for(int x : marks)
+        cout << x << " ";
+
+    return 0;
+}
