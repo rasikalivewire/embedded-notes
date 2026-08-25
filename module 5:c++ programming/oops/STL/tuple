@@ -1,0 +1,14 @@
+#include <iostream>
+#include <tuple>
+using namespace std;
+
+int main()
+{
+    tuple<int, string, float> student(101, "Ravi", 85.5);
+
+    cout << get<0>(student) << endl;
+    cout << get<1>(student) << endl;
+    cout << get<2>(student) << endl;
+
+    return 0;
+}
