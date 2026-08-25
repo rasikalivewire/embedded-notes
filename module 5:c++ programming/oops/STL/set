@@ -1,0 +1,13 @@
+#include <iostream>
+#include <set>
+using namespace std;
+
+int main()
+{
+    set<int> numbers = {10, 20, 10, 30, 20};
+
+    for(int x : numbers)
+        cout << x << " ";
+
+    return 0;
+}
