@@ -1,0 +1,16 @@
+#include <iostream>
+#include <map>
+using namespace std;
+
+int main()
+{
+    map<int, string> students;
+
+    students[101] = "Ravi";
+    students[102] = "Kumar";
+    students[103] = "Priya";
+
+    cout << students[102];
+
+    return 0;
+}
