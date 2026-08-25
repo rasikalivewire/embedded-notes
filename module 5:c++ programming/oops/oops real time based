@@ -1,0 +1,192 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// ===============================
+// BASE CLASS - INHERITANCE
+// ===============================
+class Visitor
+{
+protected:
+    string name;
+    int age;
+
+public:
+    // CONSTRUCTOR
+    Visitor(string n, int a)
+    {
+        name = n;
+        age = a;
+    }
+
+    virtual void showDetails()
+    {
+        cout << "Visitor Name : " << name << endl;
+        cout << "Age          : " << age << endl;
+    }
+
+    // DESTRUCTOR
+    virtual ~Visitor()
+    {
+        cout << "Visitor object destroyed\n";
+    }
+};
+
+// ===============================
+// DERIVED CLASS
+// ===============================
+class LocalVisitor : public Visitor
+{
+private:
+    int ticketPrice;
+
+public:
+    LocalVisitor(string n, int a, int price)
+        : Visitor(n, a)
+    {
+        ticketPrice = price;
+    }
+
+    // FUNCTION OVERRIDING
+    void showDetails() override
+    {
+        cout << "\n--- Local Visitor ---\n";
+        cout << "Name         : " << name << endl;
+        cout << "Age          : " << age << endl;
+        cout << "Ticket Price : Rs." << ticketPrice << endl;
+    }
+};
+
+// ===============================
+// ANOTHER DERIVED CLASS
+// ===============================
+class ForeignVisitor : public Visitor
+{
+private:
+    int ticketPrice;
+
+public:
+    ForeignVisitor(string n, int a, int price)
+        : Visitor(n, a)
+    {
+        ticketPrice = price;
+    }
+
+    // FUNCTION OVERRIDING
+    void showDetails() override
+    {
+        cout << "\n--- Foreign Visitor ---\n";
+        cout << "Name         : " << name << endl;
+        cout << "Age          : " << age << endl;
+        cout << "Ticket Price : Rs." << ticketPrice << endl;
+    }
+};
+
+// ===============================
+// ENCAPSULATION
+// ===============================
+class Ticket
+{
+private:
+    int ticketNumber;
+    double amount;
+
+public:
+    Ticket(int number, double price)
+    {
+        ticketNumber = number;
+        amount = price;
+    }
+
+    // GETTER
+    int getTicketNumber()
+    {
+        return ticketNumber;
+    }
+
+    // GETTER
+    double getAmount()
+    {
+        return amount;
+    }
+
+    // ABSTRACTION
+    void printTicket()
+    {
+        cout << "\n--- TICKET ---\n";
+        cout << "Ticket Number : " << ticketNumber << endl;
+        cout << "Amount        : Rs." << amount << endl;
+    }
+};
+
+// ===============================
+// FUNCTION OVERLOADING
+// ===============================
+class Booking
+{
+public:
+
+    void bookTicket()
+    {
+        cout << "\nTicket booked for 1 person.\n";
+    }
+
+    void bookTicket(int persons)
+    {
+        cout << "\nTickets booked for "
+             << persons << " persons.\n";
+    }
+
+    void bookTicket(int persons, string ride)
+    {
+        cout << "\nTickets booked for "
+             << persons << " persons.\n";
+
+        cout << "Ride : " << ride << endl;
+    }
+};
+
+// ===============================
+// MAIN FUNCTION
+// ===============================
+int main()
+{
+    cout << "===== WONDERLAND TOURIST PARK =====\n";
+
+    // OBJECT CREATION
+    LocalVisitor v1("Rasi", 22, 300);
+
+    ForeignVisitor v2("John", 30, 1000);
+
+    // POLYMORPHISM
+    Visitor *v;
+
+    v = &v1;
+    v->showDetails();
+
+    v = &v2;
+    v->showDetails();
+
+    // ENCAPSULATION + ABSTRACTION
+    Ticket t1(101, 300);
+
+    t1.printTicket();
+
+    // ACCESS THROUGH GETTER
+    cout << "\nTicket Number : "
+         << t1.getTicketNumber();
+
+    cout << "\nTicket Amount : Rs."
+         << t1.getAmount() << endl;
+
+    // FUNCTION OVERLOADING
+    Booking b;
+
+    b.bookTicket();
+
+    b.bookTicket(5);
+
+    b.bookTicket(5, "Roller Coaster");
+
+    return 0;
+}
