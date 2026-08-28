@@ -1,0 +1,110 @@
+#include <xc.h>
+
+// Configuration bits
+#pragma config FOSC = HS
+#pragma config WDTE = OFF
+#pragma config PWRTE = ON
+#pragma config BOREN = ON
+#pragma config LVP = OFF
+#pragma config CP = OFF
+
+#define _XTAL_FREQ 20000000
+
+volatile unsigned int count = 0;
+volatile unsigned char speed = 1;
+
+
+// Timer0 Interrupt
+void __interrupt() ISR(void)
+{
+    if(TMR0IF)
+    {
+        TMR0IF = 0;       // Clear Timer0 flag
+        
+        TMR0 = 61;        // Reload Timer0
+
+        count++;
+
+        if(speed == 1)
+        {
+            if(count >= 50)      // 500ms
+            {
+                RB0 = !RB0;
+                count = 0;
+            }
+        }
+
+        else if(speed == 2)
+        {
+            if(count >= 100)     // 1 second
+            {
+                RB0 = !RB0;
+                count = 0;
+            }
+        }
+
+        else if(speed == 3)
+        {
+            if(count >= 200)     // 2 second
+            {
+                RB0 = !RB0;
+                count = 0;
+            }
+        }
+    }
+}
+
+
+void main()
+{
+    // PORTB direction
+    TRISB=0X00;
+    TRISBbits.TRISB0 = 0;   // RB0 LED output
+    TRISBbits.TRISB1 = 1;   // RB1 switch input
+
+    // Initial values
+    RB0 = 0;
+
+
+    // Disable analog functions
+    ADCON1 = 0x06;
+
+
+    // Timer0 configuration
+    OPTION_REGbits.T0CS = 0;    // Internal clock
+    OPTION_REGbits.PSA = 0;     // Prescaler assigned Timer0
+
+    OPTION_REGbits.PS2 = 1;
+    OPTION_REGbits.PS1 = 1;
+    OPTION_REGbits.PS0 = 1;     // Prescaler 1:256
+
+
+    TMR0 = 61;
+
+
+    // Enable interrupts
+    INTCONbits.TMR0IE = 1;      // Timer0 interrupt enable
+    INTCONbits.TMR0IF = 0;      // Clear flag
+    INTCONbits.GIE = 1;         // Global interrupt enable
+
+
+
+    while(1)
+    {
+        if(RB1 == 0)           // Switch pressed
+        {
+            __delay_ms(200);   // Debounce
+
+
+            speed++;
+
+            if(speed > 3)
+            {
+                speed = 1;
+            }
+
+
+            while(RB1 == 0);   // Wait until release
+        }
+    }
+}
