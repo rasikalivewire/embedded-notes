@@ -1,0 +1,445 @@
+#include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
+#include <PubSubClient.h>
+#include <time.h>
+#include "Secrets.h"
+#include "DHT.h"
+
+
+// =====================================================
+// DHT11
+// =====================================================
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+
+// =====================================================
+// MQTT TOPICS
+// =====================================================
+
+#define AWS_IOT_PUBLISH_TOPIC "esp8266/pub"
+#define AWS_IOT_SUBSCRIBE_TOPIC "esp8266/sub"
+
+
+// =====================================================
+// AWS SECURE CONNECTION
+// =====================================================
+
+WiFiClientSecure net;
+
+BearSSL::X509List rootCA(cacert);
+BearSSL::X509List deviceCert(client_cert);
+BearSSL::PrivateKey privateKey(privkey);
+
+PubSubClient client(net);
+
+
+// =====================================================
+// WIFI CONNECTION
+// =====================================================
+
+void connectWiFi()
+{
+  Serial.println();
+  Serial.println("================================");
+  Serial.println("CONNECTING TO WIFI");
+  Serial.println("================================");
+
+  WiFi.mode(WIFI_STA);
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  int attempts = 0;
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+
+    Serial.print(".");
+
+    attempts++;
+
+    if (attempts >= 60)
+    {
+      Serial.println();
+      Serial.println("WiFi connection failed!");
+      ESP.restart();
+    }
+  }
+
+  Serial.println();
+  Serial.println("WiFi connected!");
+
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+
+// =====================================================
+// NTP TIME
+// =====================================================
+
+void setupTime()
+{
+  Serial.println();
+  Serial.println("================================");
+  Serial.println("SETTING TIME");
+  Serial.println("================================");
+
+  configTime(
+    TIME_ZONE * 3600,
+    0,
+    "pool.ntp.org",
+    "time.nist.gov"
+  );
+
+  time_t now = time(nullptr);
+
+  int attempts = 0;
+
+  while (now < 100000 && attempts < 30)
+  {
+    delay(500);
+
+    Serial.print(".");
+
+    now = time(nullptr);
+
+    attempts++;
+  }
+
+  Serial.println();
+
+  if (now >= 100000)
+  {
+    Serial.print("Current time: ");
+    Serial.println(ctime(&now));
+  }
+  else
+  {
+    Serial.println("NTP time failed!");
+  }
+}
+
+
+// =====================================================
+// MQTT MESSAGE CALLBACK
+// =====================================================
+
+void messageReceived(
+  char* topic,
+  byte* payload,
+  unsigned int length
+)
+{
+  Serial.println();
+  Serial.println("================================");
+  Serial.println("MQTT MESSAGE RECEIVED");
+  Serial.println("================================");
+
+  Serial.print("Topic: ");
+  Serial.println(topic);
+
+  Serial.print("Message: ");
+
+  for (unsigned int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+  }
+
+  Serial.println();
+}
+
+
+// =====================================================
+// CONNECT TO AWS IoT
+// =====================================================
+
+bool connectAWS()
+{
+  Serial.println();
+  Serial.println("================================");
+  Serial.println("CONNECTING TO AWS IoT");
+  Serial.println("================================");
+
+  Serial.print("Endpoint: ");
+  Serial.println(MQTT_HOST);
+
+  Serial.print("Thing / Client ID: ");
+  Serial.println(THINGNAME);
+
+
+  // ---------------------------------------------------
+  // AWS ROOT CA
+  // ---------------------------------------------------
+
+  net.setTrustAnchors(&rootCA);
+
+
+  // ---------------------------------------------------
+  // DEVICE CERTIFICATE + PRIVATE KEY
+  // ---------------------------------------------------
+
+  net.setClientRSACert(
+    &deviceCert,
+    &privateKey
+  );
+
+
+  // ---------------------------------------------------
+  // CONNECTION TIMEOUT
+  // ---------------------------------------------------
+
+  net.setTimeout(30);
+
+
+  // ---------------------------------------------------
+  // MQTT SERVER
+  // ---------------------------------------------------
+
+  client.setServer(
+    MQTT_HOST,
+    8883
+  );
+
+  client.setCallback(messageReceived);
+
+  client.setKeepAlive(60);
+
+
+  // ---------------------------------------------------
+  // MQTT CONNECTION
+  // ---------------------------------------------------
+
+  Serial.println();
+  Serial.println("Connecting MQTT...");
+
+  int attempts = 0;
+
+  while (!client.connected() && attempts < 5)
+  {
+    attempts++;
+
+    Serial.print("MQTT attempt ");
+    Serial.print(attempts);
+    Serial.println("...");
+
+    if (client.connect(THINGNAME))
+    {
+      Serial.println();
+      Serial.println("================================");
+      Serial.println("AWS IoT MQTT CONNECTED!");
+      Serial.println("================================");
+
+
+      // ------------------------------------------------
+      // SUBSCRIBE
+      // ------------------------------------------------
+
+      if (client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC))
+      {
+        Serial.print("Subscribed to: ");
+        Serial.println(AWS_IOT_SUBSCRIBE_TOPIC);
+      }
+      else
+      {
+        Serial.println("Subscribe failed!");
+      }
+
+      return true;
+    }
+    else
+    {
+      Serial.print("MQTT failed, state = ");
+      Serial.println(client.state());
+
+      delay(3000);
+    }
+  }
+
+
+  Serial.println();
+  Serial.println("AWS MQTT CONNECTION FAILED!");
+
+  return false;
+}
+
+
+// =====================================================
+// READ DHT11 + PUBLISH MQTT
+// =====================================================
+
+void publishSensorData()
+{
+  float humidity = dht.readHumidity();
+
+  float temperature = dht.readTemperature();
+
+
+  // ---------------------------------------------------
+  // CHECK SENSOR
+  // ---------------------------------------------------
+
+  if (isnan(humidity) || isnan(temperature))
+  {
+    Serial.println("DHT11 reading failed!");
+
+    return;
+  }
+
+
+  // ---------------------------------------------------
+  // DISPLAY SENSOR DATA
+  // ---------------------------------------------------
+
+  Serial.println();
+  Serial.println("================================");
+  Serial.println("DHT11 SENSOR DATA");
+  Serial.println("================================");
+
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
+
+
+  // ---------------------------------------------------
+  // CREATE JSON
+  // ---------------------------------------------------
+
+  String payload = "{";
+
+  payload += "\"temperature\":";
+  payload += String(temperature, 1);
+
+  payload += ",\"humidity\":";
+  payload += String(humidity, 1);
+
+  payload += "}";
+
+
+  Serial.print("MQTT Payload: ");
+  Serial.println(payload);
+
+
+  // ---------------------------------------------------
+  // PUBLISH
+  // ---------------------------------------------------
+
+  if (client.publish(
+        AWS_IOT_PUBLISH_TOPIC,
+        payload.c_str()
+      ))
+  {
+    Serial.println("Publish SUCCESS!");
+  }
+  else
+  {
+    Serial.println("Publish FAILED!");
+  }
+}
+
+
+// =====================================================
+// SETUP
+// =====================================================
+
+void setup()
+{
+  Serial.begin(115200);
+
+  delay(1000);
+
+  Serial.println();
+  Serial.println();
+  Serial.println("======================================");
+  Serial.println("ESP8266 + DHT11 + AWS IoT");
+  Serial.println("======================================");
+
+
+  // ---------------------------------------------------
+  // START DHT11
+  // ---------------------------------------------------
+
+  dht.begin();
+
+  delay(2000);
+
+
+  // ---------------------------------------------------
+  // WIFI
+  // ---------------------------------------------------
+
+  connectWiFi();
+
+
+  // ---------------------------------------------------
+  // NTP
+  // ---------------------------------------------------
+
+  setupTime();
+
+
+  // ---------------------------------------------------
+  // AWS IoT
+  // ---------------------------------------------------
+
+  if (!connectAWS())
+  {
+    Serial.println();
+    Serial.println("AWS connection failed.");
+
+    Serial.println("Restarting in 10 seconds...");
+
+    delay(10000);
+
+    ESP.restart();
+  }
+}
+
+
+// =====================================================
+// LOOP
+// =====================================================
+
+void loop()
+{
+  // ---------------------------------------------------
+  // CHECK MQTT CONNECTION
+  // ---------------------------------------------------
+
+  if (!client.connected())
+  {
+    Serial.println();
+    Serial.println("MQTT disconnected!");
+
+    connectAWS();
+  }
+
+
+  // ---------------------------------------------------
+  // MQTT LOOP
+  // ---------------------------------------------------
+
+  client.loop();
+
+
+  // ---------------------------------------------------
+  // PUBLISH EVERY 10 SECONDS
+  // ---------------------------------------------------
+
+  static unsigned long lastPublish = 0;
+
+  if (millis() - lastPublish >= 10000)
+  {
+    lastPublish = millis();
+
+    publishSensorData();
+  }
+}
