@@ -1,0 +1,241 @@
+
+# LINUX BASIC AND IMPORTANT COMMANDS
+
+## 1. Directory and Navigation Commands
+
+| Command | Description                                              | Example        |
+| ------- | -------------------------------------------------------- | -------------- |
+| `pwd`   | Displays the current working directory.                  | `pwd`          |
+| `ls`    | Lists files and directories.                             | `ls`           |
+| `ls -l` | Displays files with detailed information.                | `ls -l`        |
+| `ls -a` | Displays all files, including hidden files.              | `ls -a`        |
+| `cd`    | Changes the current directory.                           | `cd Documents` |
+| `cd ..` | Moves to the parent directory.                           | `cd ..`        |
+| `cd ~`  | Moves to the user's home directory.                      | `cd ~`         |
+| `cd /`  | Moves to the root directory.                             | `cd /`         |
+| `tree`  | Displays directories in a tree structure (if installed). | `tree`         |
+
+## 2. File and Directory Management Commands
+
+| Command    | Description                                        | Example                |
+| ---------- | -------------------------------------------------- | ---------------------- |
+| `touch`    | Creates an empty file if it does not exist.        | `touch file.txt`       |
+| `mkdir`    | Creates a new directory.                           | `mkdir project`        |
+| `mkdir -p` | Creates nested directories as needed.              | `mkdir -p project/src` |
+| `rmdir`    | Removes an empty directory.                        | `rmdir project`        |
+| `cp`       | Copies files.                                      | `cp a.txt b.txt`       |
+| `cp -r`    | Copies directories and their contents recursively. | `cp -r src backup`     |
+| `mv`       | Moves or renames files and directories.            | `mv old.txt new.txt`   |
+| `rm`       | Removes a file.                                    | `rm file.txt`          |
+| `rm -r`    | Removes a directory and its contents recursively.  | `rm -r backup`         |
+| `file`     | Identifies a file's type.                          | `file program.c`       |
+
+Important: Be careful with `rm`, especially `rm -r`. Deleted files may not be recoverable.
+
+## 3. File Viewing and Text Processing Commands
+
+| Command     | Description                                      | Example                |
+| ----------- | ------------------------------------------------ | ---------------------- |
+| `cat`       | Displays file contents.                          | `cat notes.txt`        |
+| `less`      | Views a file one screen at a time.               | `less notes.txt`       |
+| `more`      | Displays file contents page by page.             | `more notes.txt`       |
+| `head`      | Displays the first 10 lines by default.          | `head notes.txt`       |
+| `head -n 5` | Displays the first 5 lines.                      | `head -n 5 notes.txt`  |
+| `tail`      | Displays the last 10 lines by default.           | `tail notes.txt`       |
+| `tail -f`   | Continuously displays new lines added to a file. | `tail -f app.log`      |
+| `wc`        | Counts lines, words, and bytes.                  | `wc notes.txt`         |
+| `sort`      | Sorts lines of text.                             | `sort names.txt`       |
+| `uniq`      | Removes adjacent duplicate lines.                | `uniq names.txt`       |
+| `grep`      | Searches for matching text.                      | `grep "error" app.log` |
+| `diff`      | Compares two files line by line.                 | `diff a.txt b.txt`     |
+
+## 4. File Permissions and Ownership Commands
+
+| Command    | Description                                       | Example                    |
+| ---------- | ------------------------------------------------- | -------------------------- |
+| `chmod`    | Changes file permissions.                         | `chmod 755 script.sh`      |
+| `chmod +x` | Adds execute permission.                          | `chmod +x script.sh`       |
+| `chown`    | Changes file owner.                               | `sudo chown user file.txt` |
+| `ls -l`    | Displays file permissions and ownership.          | `ls -l`                    |
+| `umask`    | Displays or sets default permission restrictions. | `umask`                    |
+
+Linux permissions are represented by `r` (read), `w` (write), and `x` (execute).
+
+Example: `chmod 755 script.sh` gives the owner read, write, and execute permissions, while the group and others get read and execute permissions.
+
+## 5. User and System Information Commands
+
+| Command    | Description                                      | Example    |
+| ---------- | ------------------------------------------------ | ---------- |
+| `whoami`   | Displays the current username.                   | `whoami`   |
+| `who`      | Displays logged-in users.                        | `who`      |
+| `id`       | Displays user ID and group information.          | `id`       |
+| `hostname` | Displays the system's hostname.                  | `hostname` |
+| `uname`    | Displays kernel information.                     | `uname`    |
+| `uname -a` | Displays detailed system and kernel information. | `uname -a` |
+| `date`     | Displays the current date and time.              | `date`     |
+| `uptime`   | Displays how long the system has been running.   | `uptime`   |
+| `history`  | Displays previously executed commands.           | `history`  |
+| `clear`    | Clears the terminal screen.                      | `clear`    |
+
+## 6. Process Management Commands
+
+| Command   | Description                                           | Example        |
+| --------- | ----------------------------------------------------- | -------------- |
+| `ps`      | Displays processes associated with the terminal.      | `ps`           |
+| `ps aux`  | Displays a detailed list of running processes.        | `ps aux`       |
+| `top`     | Displays live process and resource usage information. | `top`          |
+| `kill`    | Sends a signal to a process using its PID.            | `kill 1234`    |
+| `kill -9` | Forcefully terminates a process.                      | `kill -9 1234` |
+| `pgrep`   | Finds process IDs by process name.                    | `pgrep python` |
+| `jobs`    | Lists jobs started in the current shell.              | `jobs`         |
+| `bg`      | Resumes a stopped job in the background.              | `bg`           |
+| `fg`      | Brings a background job to the foreground.            | `fg`           |
+| `sleep`   | Pauses execution for a specified duration.            | `sleep 5`      |
+
+Note: Replace `1234` with the actual process ID. Use `kill -9` only when normal termination does not work.
+
+## 7. System Monitoring and Disk Commands
+
+| Command   | Description                                          | Example            |
+| --------- | ---------------------------------------------------- | ------------------ |
+| `df -h`   | Displays available and used disk space.              | `df -h`            |
+| `du -sh`  | Displays the total size of a directory or file.      | `du -sh Documents` |
+| `free -h` | Displays memory usage.                               | `free -h`          |
+| `lsblk`   | Lists block storage devices and partitions.          | `lsblk`            |
+| `blkid`   | Displays block device identification information.    | `sudo blkid`       |
+| `mount`   | Displays mounted filesystems or mounts a filesystem. | `mount`            |
+| `dmesg`   | Displays kernel messages.                            | `dmesg`            |
+| `uptime`  | Displays uptime and system load averages.            | `uptime`           |
+| `lscpu`   | Displays CPU architecture information.               | `lscpu`            |
+| `lsusb`   | Lists USB devices, if the utility is installed.      | `lsusb`            |
+
+## 8. Networking Commands
+
+| Command       | Description                                            | Example                                      |
+| ------------- | ------------------------------------------------------ | -------------------------------------------- |
+| `ip addr`     | Displays network interfaces and IP addresses.          | `ip addr`                                    |
+| `ip link`     | Displays network interface status.                     | `ip link`                                    |
+| `ip route`    | Displays routing information.                          | `ip route`                                   |
+| `ping`        | Tests network connectivity.                            | `ping -c 4 google.com`                       |
+| `hostname -I` | Displays assigned IP addresses.                        | `hostname -I`                                |
+| `ss -tuln`    | Displays listening TCP and UDP sockets.                | `ss -tuln`                                   |
+| `curl`        | Transfers data from or to a URL.                       | `curl https://example.com`                   |
+| `wget`        | Downloads files from supported URLs.                   | `wget https://example.com/file.txt`          |
+| `ssh`         | Connects securely to a remote system.                  | `ssh user@192.168.1.10`                      |
+| `scp`         | Copies files between systems over SSH.                 | `scp file.txt user@192.168.1.10:/home/user/` |
+| `traceroute`  | Shows the network path to a destination, if installed. | `traceroute google.com`                      |
+
+## 9. Package Management Commands
+
+For Debian-based Linux distributions such as Ubuntu and Raspberry Pi OS:
+
+| Command            | Description                                           | Example                       |
+| ------------------ | ----------------------------------------------------- | ----------------------------- |
+| `sudo apt update`  | Updates package repository information.               | `sudo apt update`             |
+| `sudo apt upgrade` | Installs available package upgrades.                  | `sudo apt upgrade`            |
+| `sudo apt install` | Installs a software package.                          | `sudo apt install gcc`        |
+| `sudo apt remove`  | Removes an installed package.                         | `sudo apt remove gcc`         |
+| `sudo apt purge`   | Removes a package and its system configuration files. | `sudo apt purge package-name` |
+| `apt search`       | Searches available packages.                          | `apt search python3`          |
+| `apt show`         | Displays package details.                             | `apt show gcc`                |
+| `dpkg -l`          | Lists installed packages.                             | `dpkg -l`                     |
+
+`sudo` runs a command with elevated privileges when the user is authorized to do so.
+
+## 10. Searching Commands
+
+| Command   | Description                                    | Example              |
+| --------- | ---------------------------------------------- | -------------------- |
+| `find`    | Searches for files and directories.            | `find . -name "*.c"` |
+| `locate`  | Searches a filename database, if installed.    | `locate main.c`      |
+| `which`   | Displays the executable path of a command.     | `which gcc`          |
+| `whereis` | Locates binary, source, and manual files.      | `whereis gcc`        |
+| `grep -r` | Searches text recursively through directories. | `grep -r "main" .`   |
+
+## 11. Input, Output and Redirection Commands
+
+| Command | Description                                    | Example                            |
+| ------- | ---------------------------------------------- | ---------------------------------- |
+| `echo`  | Prints text to the terminal.                   | `echo "Hello Linux"`               |
+| `>`     | Redirects output and overwrites a file.        | `echo "Hello" > a.txt`             |
+| `>>`    | Appends output to a file.                      | `echo "World" >> a.txt`            |
+| `<`     | Uses a file as command input.                  | `sort < names.txt`                 |
+| `\\|`   | Sends one command's output to another command. | `ls \\| grep ".c"`                 |
+| `tee`   | Writes output to a file and displays it.       | `ls \\| tee files.txt`             |
+| `xargs` | Builds command arguments from standard input.  | `printf "a.txt\n" \\| xargs ls -l` |
+
+## 12. Archive and Compression Commands
+
+| Command     | Description                             | Example                            |
+| ----------- | --------------------------------------- | ---------------------------------- |
+| `tar -cvf`  | Creates a tar archive.                  | `tar -cvf backup.tar project/`     |
+| `tar -xvf`  | Extracts a tar archive.                 | `tar -xvf backup.tar`              |
+| `tar -czvf` | Creates a gzip-compressed tar archive.  | `tar -czvf backup.tar.gz project/` |
+| `tar -xzvf` | Extracts a gzip-compressed tar archive. | `tar -xzvf backup.tar.gz`          |
+| `gzip`      | Compresses a file.                      | `gzip file.txt`                    |
+| `gunzip`    | Decompresses a gzip file.               | `gunzip file.txt.gz`               |
+| `zip`       | Creates a ZIP archive, if installed.    | `zip backup.zip file.txt`          |
+| `unzip`     | Extracts a ZIP archive.                 | `unzip backup.zip`                 |
+
+## 13. Linux Commands for Embedded Systems and Raspberry Pi
+
+| Command              | Description                                                                                      | Example                     |
+| -------------------- | ------------------------------------------------------------------------------------------------ | --------------------------- |
+| `gcc`                | Compiles C programs.                                                                             | `gcc main.c -o main`        |
+| `./main`             | Executes a compiled program in the current directory.                                            | `./main`                    |
+| `make`               | Builds software using a Makefile.                                                                | `make`                      |
+| `ls /dev`            | Lists device files.                                                                              | `ls /dev`                   |
+| `ls /dev/tty*`       | Lists device paths matching the serial-terminal naming pattern.                                  | `ls /dev/tty*`              |
+| `ls /sys/class/gpio` | Checks for the legacy GPIO sysfs interface.                                                      | `ls /sys/class/gpio`        |
+| `ls /dev/gpiochip*`  | Lists GPIO character devices, if present.                                                        | `ls /dev/gpiochip*`         |
+| `journalctl -b`      | Displays system journal logs from the current boot.                                              | `journalctl -b`             |
+| `systemctl status`   | Displays the status of a specified system service.                                               | `systemctl status ssh`      |
+| `systemctl start`    | Starts a system service.                                                                         | `sudo systemctl start ssh`  |
+| `systemctl stop`     | Stops a system service.                                                                          | `sudo systemctl stop ssh`   |
+| `systemctl enable`   | Configures a service to start automatically at boot.                                             | `sudo systemctl enable ssh` |
+| `i2cdetect -y 1`     | Scans I²C bus 1 for responding addresses, if the I²C tools are installed and the bus is enabled. | `sudo i2cdetect -y 1`       |
+| `lsmod`              | Lists loaded kernel modules.                                                                     | `lsmod`                     |
+| `modinfo`            | Displays information about a kernel module.                                                      | `modinfo module_name`       |
+
+Some commands depend on the Linux distribution, installed utilities, hardware, and permissions. Raspberry Pi GPIO and I²C device paths can also differ by OS version and configuration.
+
+## 14. Shutdown and Restart Commands
+
+| Command          | Description                            | Example               |
+| ---------------- | -------------------------------------- | --------------------- |
+| `shutdown now`   | Shuts down the system immediately.     | `sudo shutdown now`   |
+| `shutdown -h +5` | Schedules shutdown after five minutes. | `sudo shutdown -h +5` |
+| `shutdown -c`    | Cancels a scheduled shutdown.          | `sudo shutdown -c`    |
+| `reboot`         | Restarts the system.                   | `sudo reboot`         |
+| `poweroff`       | Powers off the system.                 | `sudo poweroff`       |
+
+Save your work before shutting down or restarting.
+
+## 15. Essential Linux Commands to Practise First
+
+Start with these 20 commands before moving to advanced Linux and Embedded Linux topics.
+
+```
+1.  pwd
+2.  ls
+3.  cd
+4.  mkdir
+5.  touch
+6.  cat
+7.  cp
+8.  mv
+9.  rm
+10. rmdir
+11. chmod
+12. grep
+13. find
+14. ps
+15. top
+16. df -h
+17. free -h
+18. ip addr
+19. ping
+20. sudo apt update
+```
+ foundation for working with Linux terminals, Raspberry Pi, C programming, device interfaces, and embedded development.
